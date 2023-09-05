@@ -1,4 +1,4 @@
-exclude: ".git|.*/migrations/"
+exclude: ".git"  # |.*/migrations/
 default_stages: [commit]
 fail_fast: true
 
@@ -40,3 +40,5 @@ repos:
     rev: v1.5.1
     hooks:
       - id: mypy
+        exclude: .*/migrations/.*
+        args: ["--config-file=setup.cfg"]

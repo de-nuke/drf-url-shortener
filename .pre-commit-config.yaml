@@ -1,4 +1,4 @@
-exclude: ".git"
+exclude: ".git|.*/migrations/"
 default_stages: [commit]
 fail_fast: true
 
@@ -35,3 +35,8 @@ repos:
     hooks:
       - id: bandit
         args: ["-lll", "-q", "--exclude=*/tests/*"]  # Options: only HIGH severity; output only in the case of an error
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy

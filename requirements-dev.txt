@@ -4,3 +4,4 @@ pytest-django~=4.0
 pytest-mock~=3.0
 pytest-cov~=4.0
 freezegun~=1.0
+factory-boy~=3.3

@@ -29,12 +29,15 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[str] = []
 
+SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 # Application definition
 
 INSTALLED_APPS = [
+    "shortener",
+    "rest_framework",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

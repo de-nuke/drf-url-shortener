@@ -1,4 +1,5 @@
-from rest_framework import exceptions, serializers
+from rest_framework import serializers
+from rest_framework.exceptions import APIException
 
 from shortener import shortcuts
 from shortener.models import URL
@@ -9,13 +10,13 @@ class URLSerializer(serializers.ModelSerializer):
 
     url = serializers.URLField(source="original")
 
-    def validate(self, attrs):
+    def create(self, validated_data):
+        """Generate "shortcut" before creating the URL instance."""
         try:
-            shortcut = shortcuts.get_shortcut()
+            validated_data["shortcut"] = shortcuts.get_shortcut()
         except shortcuts.GenerationError as e:
-            raise exceptions.ValidationError(str(e)) from e
-        attrs["shortcut"] = shortcut
-        return attrs
+            raise APIException(str(e))
+        return super().create(validated_data)
 
     class Meta:
         model = URL

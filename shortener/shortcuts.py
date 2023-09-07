@@ -36,7 +36,7 @@ def get_shortcut() -> str:
     shortcut_length = constants.MIN_SHORTCUT_LENGTH
     shortcut = get_random_slug(shortcut_length)
     attempt = 1
-    while URL.objects.filter(shortcut=shortcut).exists():
+    while URL.objects.filter(shortcut=shortcut).exists() or shortcut in constants.DISALLOWED_SHORTCUTS:
         if attempt >= SAME_LENGTH_ATTEMPTS:
             shortcut_length += 1
             attempt = 1

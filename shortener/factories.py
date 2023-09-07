@@ -1,4 +1,4 @@
-import factory
+import factory  # type: ignore
 
 from shortener import constants
 from shortener.models import URL

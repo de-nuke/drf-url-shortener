@@ -2,6 +2,7 @@ import urllib.parse
 
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 from shortener import constants
 
@@ -17,7 +18,9 @@ class URL(models.Model):
 
     @property
     def shortened_url(self):
-        return urllib.parse.urljoin(settings.SITE_URL, self.shortcut)
+        """Full shortened URL that user can visit to be redirected to the original URL."""
+        path = reverse("resolve-url", args=(self.shortcut,))
+        return urllib.parse.urljoin(settings.SITE_URL, path)
 
     def __str__(self):
         return f"{self.shortcut} ({self.original})"

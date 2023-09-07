@@ -24,5 +24,7 @@ router = routers.SimpleRouter()
 router.register("urls", views.CreateRetrieveURLViewSet)
 
 urlpatterns = [
+    *router.urls,
     path("admin/", admin.site.urls),
-] + router.urls
+    path("<slug:shortcut>/", views.ResolveURLView.as_view(), name="resolve-url"),
+]

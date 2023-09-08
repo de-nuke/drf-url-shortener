@@ -4,11 +4,10 @@ import pytest
 import pytest_django.asserts
 
 from shortener import constants, shortcuts
-from shortener.factories import URLFactory
 
 
 @pytest.mark.parametrize("length", [-1, 0, 1, 10, 100])
-def test_get_random_slu_(length):
+def test_get_random_slug(length):
     """Test `shortener.shortcuts.get_random_slug`.
 
     Check that generated string is of correct length and has no forbidden characters.
@@ -24,44 +23,31 @@ def test_get_random_slu_(length):
 
 
 @pytest.mark.django_db
-def test_get_shortcut_shortcut_found(faker):
+def test_get_shortcut_shortcut_found(existing_shortcuts, faker):
     """Test `shortener.shortcuts.get_shortcut`.
 
     Check that it returns unique, non-existing shortcut
     """
-    existing_shortcuts = [
-        faker.pystr(min_chars=constants.MIN_SHORTCUT_LENGTH, max_chars=constants.MAX_SHORTCUT_LENGTH) for _ in range(3)
-    ]
     non_existing_shortcut = faker.pystr(
         min_chars=constants.MIN_SHORTCUT_LENGTH, max_chars=constants.MAX_SHORTCUT_LENGTH
     )
-    for shortcut in existing_shortcuts:
-        URLFactory(shortcut=shortcut)
 
     # Generate shortcut that already exists for 3 times in a row, then finally generate non-existing one.
-    with mock.patch("shortener.shortcuts.get_random_slug", side_effect=[*existing_shortcuts, non_existing_shortcut]):
+    random_slugs = existing_shortcuts[:3] + [non_existing_shortcut]
+    with mock.patch("shortener.shortcuts.get_random_slug", side_effect=random_slugs):
         # Each shortcut had to be tested if it exists
-        with pytest_django.asserts.assertNumQueries(len(existing_shortcuts) + 1):
+        with pytest_django.asserts.assertNumQueries(len(random_slugs)):
             shortcut = shortcuts.get_shortcut()
 
     assert shortcut == non_existing_shortcut
 
 
 @pytest.mark.django_db
-def test_get_shortcut_shortcut_not_found(faker):
+def test_get_shortcut_shortcut_not_found(existing_shortcuts):
     """Test `shortener.shortcuts.get_shortcut`.
 
     Check that it raises `GenerationError` if it was unable to find shortcut in several attempts.
     """
-    existing_shortcuts = []
-    for length in range(constants.MIN_SHORTCUT_LENGTH, constants.MAX_SHORTCUT_LENGTH + 1):
-        existing_shortcuts.extend(
-            faker.pystr(min_chars=length, max_chars=length) for _ in range(shortcuts.SAME_LENGTH_ATTEMPTS)
-        )
-
-    for shortcut in existing_shortcuts:
-        URLFactory(shortcut=shortcut)
-
     # Mock "get_random_slug" to always return an existing slug
     with mock.patch("shortener.shortcuts.get_random_slug", side_effect=existing_shortcuts):
         # Each shortcut had to be tested if it exists

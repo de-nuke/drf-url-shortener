@@ -17,10 +17,10 @@ class URL(models.Model):
     use_count = models.PositiveIntegerField("Number of uses", default=0)
 
     @property
-    def shortened_url(self):
+    def shortened_url(self) -> str:
         """Full shortened URL that user can visit to be redirected to the original URL."""
         path = reverse("resolve-url", args=(self.shortcut,))
         return urllib.parse.urljoin(settings.SITE_URL, path)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.shortcut} ({self.original})"
